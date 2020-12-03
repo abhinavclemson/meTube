@@ -1,32 +1,47 @@
 <?php
-class MessageSection {
+
+class MessageSection
+{
 
     private $con, $profileUsernameObj, $userLoggedInObj;
 
     //working
-    public function __construct($con, $profileUsername, $userLoggedInObj) {
+    public function __construct($con, $profileUsername, $userLoggedInObj)
+    {
         $this->con = $con;
         $this->profileUsernameObj = new User($con, $profileUsername);
         $this->userLoggedInObj = $userLoggedInObj;
 
-        echo $this->profileUsernameObj->getUsername();
     }
 
-    public function create() {
+    public function create()
+    {
         return $this->createMessageSection();
     }
 
-    private function createMessageSection() {
-        $numMessages = $this->getNumberOfMessages();
-        $postedBy = $this->userLoggedInObj->getUsername();
-        $profileUsernameId = $this->profileUsernameObj->getUsername();
+    private function createMessageSection()
+    {
+        $MessageBy = $this->userLoggedInObj->getUsername();
+        $MessageTo = $this->profileUsernameObj->getUsername();
+        $numMessages = $this->userLoggedInObj->getNumberOfReplies($MessageTo);
 
-        $profileButton = ButtonProvider::createUserProfileButton($this->con, $postedBy);
-        $MessageAction = "postMessage(this, \"$postedBy\", $profileUsernameId, null, \"Messages\")";
+
+        $profileButton = ButtonProvider::createUserProfileButton($this->con, $MessageBy);
+
+
+        //javascript function Ajax Message Action
+
+
+        $MessageAction = "postMessage(this, \"$MessageBy\", \"$MessageTo\", null, \"messages\")";
+
+
         $MessageButton = ButtonProvider::createButton("Message", null, $MessageAction, "postMessage");
 
-        $Messages = $this->getmessages();
+
+        //Get commment HTMl
+        $Messages = $this->userLoggedInObj->getMessages($this->profileUsernameObj->getUsername());
         $messageItems = "";
+
         foreach($Messages as $message) {
             $messageItems .= $message->create();
         }
@@ -34,11 +49,11 @@ class MessageSection {
         return "<div class='messageSection'>
 
                     <div class='header'>
-                        <span class='messageCount'>$numMessages messages</span>
+                        <span class='messageCount'> messages From $MessageTo</span>
 
                         <div class='messageForm'>
                             $profileButton
-                            <textarea class='messageBodyClass' placeholder='Add a public message'></textarea>
+                            <textarea class='messageBodyClass' placeholder='Add a private message'></textarea>
                             $MessageButton
                         </div>
                     </div>
@@ -50,44 +65,11 @@ class MessageSection {
                 </div>";
     }
 
-    private function getNumberOfMessages(){
-
-            $query = $this->con->prepare("SELECT * FROM messages where messageBy=:messageBy and messageTo=:messageTo");
-
-            $profileUsername = $this->profileUsernameObj->getUsername();
-            $username = $this->userLoggedInObj->getUsername();
-            $query->bindParam(":messageBy", $profileUsername);
-            $query->bindParam(":messageTo", $username);
-
-            $query->execute();
-
-            return  $query->rowCount();
 
 
 
-    }
-    public function getMessages()
-    {
 
-        $query = $this->con->prepare("SELECT * FROM messages where messageBy=:messageBy and messageTo=:messageTo");
-
-        $profileUsername = $this->profileUsernameObj->getUsername();
-        $username = $this->userLoggedInObj->getUsername();
-        $query->bindParam(":messageBy", $profileUsername);
-        $query->bindParam(":messageTo", $username);
-
-        $query->execute();
-
-
-        $messages = array();
-        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
-            $message = new Message($this->con, $row, $this->userLoggedInObj, $this->profileUsernameObj);
-            array_push($messages, $message);
-        }
-
-        return $messages;
-
-    }
 
 }
-?>
+
+    ?>

@@ -26,6 +26,9 @@ if(isset($_GET["category"])){
 $searchResultsProvider = new SearchResultsProvider($con, $userLoggedInObj);
 $videos = $searchResultsProvider->getVideos($term, $orderBy,$category);
 
+
+
+
 $videoGrid = new VideoGrid($con, $userLoggedInObj);
 ?>
 
@@ -38,6 +41,7 @@ $videoGrid = new VideoGrid($con, $userLoggedInObj);
 
     if(sizeof($videos) > 0) {
         echo $videoGrid->createLarge($videos, sizeof($videos) . " results found", true);
+
     }
     else {
         echo "No results found";
@@ -45,7 +49,22 @@ $videoGrid = new VideoGrid($con, $userLoggedInObj);
 
     ?>
 
+    <div class="users">
+
+        <?php
+        $users = $searchResultsProvider->getUsers($term, $orderBy,$category);
+
+        foreach($users as $user) {
+            echo $user;
+            }
+
+
+        ?>
+
+    </div>
+
 </div>
+
 
 
 

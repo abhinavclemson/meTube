@@ -5,43 +5,51 @@ class Message {
 
     private $con, $sqlData , $userLoggedInObj, $profileUsernameObj;
 
-    public function __construct($con, $input, $userLoggedInObj, $profileUsernameObj ) {
-        if(!is_array($input)) {
+    public function __construct($con,$input, $userLoggedInObj, $profileUsernameObj ) {
 
-            $query = $con->prepare("SELECT * FROM messages where messageBy=:messageBy and messageTo=:messageTo");
 
-            $profileUsername = $profileUsernameObj->getUsername();
-            $username = $userLoggedInObj->getUsername();
-            $query->bindParam(":messageBy", $profileUsername);
-            $query->bindParam(":messageTo", $username);
+            if(!is_array($input)) {
 
-            $query->execute();
+                $query = $con->prepare("SELECT * FROM messages where (messageBy=:messageBy and messageTo=:messageTo) OR (messageBy=:messageBy and messageTo=:messageTo)");
 
-            $input = $query->fetch(PDO::FETCH_ASSOC);
-        }
+                $profileUsername = $profileUsernameObj->getUsername();
+                $username = $userLoggedInObj->getUsername();
 
-        $this->sqlData = $input;
-        $this->con = $con;
-        $this->userLoggedInObj = $userLoggedInObj;
-        $this->profileUsernameObj = $profileUsernameObj;
+
+                $query->bindParam(":messageBy", $username);
+                $query->bindParam(":messageTo", $profileUsername);
+
+                $query->execute();
+                $input = $query->fetch(PDO::FETCH_ASSOC);
+
+            }
+                $this->sqlData = $input;
+                $this->con = $con;
+                $this->userLoggedInObj = $userLoggedInObj;
+                $this->profileUsernameObj = $profileUsernameObj;
+
 
     }
 
     public function create() {
         $id = $this->sqlData["id"];
-        $profileUsername  = $this->getVideoId();
+
         $body = $this->sqlData["body"];
-        $messageBy = $this->sqlData["postedBy"];
+
+        $messageBy = $this->sqlData["messageBy"];
+        $messageTo = $this->sqlData["messageTo"];
+
         $profileButton = ButtonProvider::createUserProfileButton($this->con, $messageBy);
+        $profileButton2 = ButtonProvider::createUserProfileButton($this->con, $messageTo);
+
         $timespan = $this->time_elapsed_string($this->sqlData["datePosted"]);
 
-        $messageControlsObj = new MessageControls($this->con, $this, $this->userLoggedInObj);
-        $messageControls = $messageControlsObj->create();
+
 
         $numResponses = $this->getNumberOfReplies();
 
         if($numResponses > 0) {
-            $viewRepliesText = "<span class='repliesSection viewReplies' onclick='getReplies($id, this, $profileUsername )'>
+            $viewRepliesText = "<span class='repliesSection viewReplies' onclick='getMessages( this, $messageBy, $messageTo)'>
                                     View all $numResponses replies</span>";
         }
         else {
@@ -55,7 +63,7 @@ class Message {
                         <div class='mainContainer'>
 
                             <div class='messageHeader'>
-                                <a href='profile.php?username=$messageBy'>
+                                <a href='profile.php?username=$messageBy>
                                     <span class='username'>$messageBy</span>
                                 </a>
                                 <span class='timestamp'>$timespan</span>
@@ -68,21 +76,22 @@ class Message {
 
                     </div>
 
-                    $messageControls
-                    $viewRepliesText
                 </div>";
 
 
     }
 
+
+
+
     public function getNumberOfReplies() {
-        $query = $con->prepare("SELECT * FROM messages where messageBy=:messageBy and messageTo=:messageTo");
+        $query = $this->con->prepare("SELECT * FROM messages where (messageBy=:messageBy and messageTo=:messageTo) or (messageTo=:messageBy and messageBy=:messageTo) ORDER BY id ASC");
 
         $profileUsername = $this->profileUsernameObj->getUsername();
         $username = $this->userLoggedInObj->getUsername();
-        
-        $query->bindParam(":messageBy", $profileUsername);
-        $query->bindParam(":messageTo", $username);
+
+        $query->bindParam(":messageTo", $profileUsername);
+        $query->bindParam(":messageBy", $username);
 
         $query->execute();
 
@@ -124,17 +133,19 @@ class Message {
 
     public function getReplies()
     {
-        $query = $this->con->prepare("SELECT * FROM messages where messageBy=:messageBy and messageTo=:messageTo");
+        $query = $con->prepare("SELECT * FROM messages where (messageBy= :messageBy and messageTo= :messageTo) and (messageBy= :messageTo and messageTo= :messageBy) ");
 
         $profileUsername = $this->profileUsernameObj->getUsername();
         $username = $this->userLoggedInObj->getUsername();
-        $query->bindParam(":messageBy", $profileUsername);
-        $query->bindParam(":messageTo", $username);
+
+        $query->bindParam(":messageBy", $username);
+        $query->bindParam(":messageTo", $profileUsername);
 
         $query->execute();
 
-
         $messages = array();
+
+
         while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
             $message = new Message($this->con, $row, $this->userLoggedInObj, $this->profileUsernameObj);
             array_push($messages, $message);

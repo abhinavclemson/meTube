@@ -104,5 +104,9 @@ class VideoDetailFormProvider {
     private function createSaveButton() {
         return "<button type='submit' class='btn btn-primary' name='saveButton'>Save</button>";
     }
-}
+
+
+
+    }
+
 ?>

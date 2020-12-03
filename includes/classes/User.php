@@ -1,4 +1,5 @@
 <?php
+require_once("Message.php");
 class User {
 
     private $con, $sqlData;
@@ -39,7 +40,7 @@ class User {
     }
 
     public function getProfilePic() {
-        return $this->sqlData["profilePic"];
+        return $this->sqlData["profilePic"]??'';
     }
 
     public function getSignUpDate() {
@@ -55,6 +56,15 @@ class User {
         return $query->rowCount() > 0;
     }
 
+    //block came form Buttonprovider.php
+    public function isBlock($userTo) {
+        $query = $this->con->prepare("SELECT * FROM block WHERE blockedBy=:blockedBy AND blockedTo=:blockedTo");
+        $query->bindParam(":blockedTo", $userTo);
+        $query->bindParam(":blockedBy", $username);
+        $username = $this->getUsername();
+        $query->execute();
+        return $query->rowCount() > 0;
+    }
     public function getSubscriberCount() {
         $query = $this->con->prepare("SELECT * FROM subscribers WHERE userTo=:userTo");
         $query->bindParam(":userTo", $username);
@@ -63,6 +73,23 @@ class User {
         return $query->rowCount();
     }
 
+    public function isFamily($userTo) {
+        $query = $this->con->prepare("SELECT * FROM family WHERE username=:username AND fname=:fname");
+        $query->bindParam(":fname", $userTo);
+        $query->bindParam(":username", $username);
+        $username = $this->getUsername();
+        $query->execute();
+        return $query->rowCount() > 0;
+    }
+
+    public function isFriend($userTo) {
+        $query = $this->con->prepare("SELECT * FROM friend WHERE username=:username AND fname=:fname");
+        $query->bindParam(":username", $username);
+        $query->bindParam(":fname", $userTo);
+        $username = $this->getUsername();
+        $query->execute();
+        return $query->rowCount() > 0;
+    }
 
     public function getSubscriptions() {
         $query = $this->con->prepare("SELECT userTo FROM subscribers WHERE userFrom=:userFrom");
@@ -79,7 +106,114 @@ class User {
 
 
     }
+    public function getNumberOfReplies($userTo) {
+        $query = $this->con->prepare("SELECT * FROM messages WHERE messageBy=:messageBy and messageTo=:messageTo");
+        $username = $this->getUsername();
+        $query->bindParam(":messageBy", $username);
+        $query->bindParam(":messageTo", $userTo);
 
+        $query->execute();
+
+        $subs = array();
+        while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $user = new User($this->con, $row["messageTo"]);
+            array_push($subs, $user);
+        }
+        return $subs;
+
+
+    }
+    public function getMessages($userTo) {
+        $query = $this->con->prepare("SELECT * FROM messages WHERE (messageBy=:messageBy and messageTo=:messageTo) or ( messageBy=:messageTo and messageTo=:messageBy)");
+        $username = $this->getUsername();
+
+        $query->bindParam(":messageBy", $username);
+        $query->bindParam(":messageTo", $userTo);
+
+        $query->execute();
+
+
+
+        $userObjTo = new User($this->con, $userTo);
+        $userObjFrom = new User($this->con, $username);
+        $messages = array();
+
+
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $message = new Message($this->con, $row, $userObjFrom, $userObjTo);
+            array_push($messages, $message);
+        }
+
+        return $messages;
+
+    }
+
+
+    public function getFamily() {
+        $query = $this->con->prepare("SELECT fname FROM family WHERE username=:username");
+        $username = $this->getUsername();
+
+        $query->bindParam(":username", $username);
+
+        $query->execute();
+
+
+
+        $families = array();
+
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $user = ButtonProvider::createUserProfileButtonSearch($this->con, $row['fname'] );
+            array_push($families, $user);
+        }
+
+
+        return $families;
+
+    }
+
+    public function getFriends() {
+        $query = $this->con->prepare("SELECT fname FROM friend WHERE username=:username");
+        $username = $this->getUsername();
+
+        $query->bindParam(":username", $username);
+
+        $query->execute();
+
+
+
+        $friends = array();
+
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $user = ButtonProvider::createUserProfileButtonSearch($this->con, $row['fname'] );
+            array_push($friends, $user);
+        }
+
+
+        return $friends;
+
+    }
+
+    public function getBlocked() {
+        $query = $this->con->prepare("SELECT blockedTo FROM block WHERE blockedBy=:username");
+        $username = $this->getUsername();
+
+        $query->bindParam(":username", $username);
+
+        $query->execute();
+
+
+
+        $friends = array();
+
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $user = ButtonProvider::createUserProfileButtonSearch($this->con, $row['blockedTo'] );
+            array_push($friends, $user);
+        }
+
+
+        return $friends;
+
+    }
 
 
 }

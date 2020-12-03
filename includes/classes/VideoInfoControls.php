@@ -54,7 +54,6 @@ class VideoInfoControls {
     }
 
     private function createfavouriteButton() {
-        $text = $this->video->getDislikes();
         $videoId = $this->video->getId();
         $action = "favourite(this, $videoId)";
         $class = "favouriteButton";
@@ -67,5 +66,7 @@ class VideoInfoControls {
 
         return ButtonProvider::createButton('', $imageSrc, $action, $class);
     }
+
+
 }
 ?>

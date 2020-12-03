@@ -16,6 +16,7 @@ require_once("includes/classes/LikedVideosProvider.php");
 $usernameLoggedIn = User::isLoggedIn() ? $_SESSION["userLoggedIn"] : "";
 $userLoggedInObj = new User($con, $usernameLoggedIn);
 
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -28,8 +29,11 @@ $userLoggedInObj = new User($con, $usernameLoggedIn);
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="assets/js/commonActions.js"></script>
-    <script src="assets/js/messageActions.js"></script>
+
+    <script src="assets/js/blockActions.js" type='text/javascript'></script>
+    <script src="assets/js/commonActions.js" type='text/javascript'></script>
+    <script src="assets/js/userActions.js" type='text/javascript'></script>
+    <script src="assets/js/messageActions.js" type='text/javascript'></script>
 
 
 </head>

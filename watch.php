@@ -10,8 +10,24 @@ if(!isset($_GET["id"])) {
     exit();
 }
 
+
 $video = new Video($con, $_GET["id"], $userLoggedInObj);
+$video->getUploadedBy();
 $video->incrementViews();
+
+
+$profileUsername = $video->getUploadedBy();
+$profileUsernameObj = new User($con, $profileUsername);
+
+if($profileUsernameObj->isBlock($userLoggedInObj->getUsername())){
+        echo "Video not found";
+        exit();
+}
+if($userLoggedInObj->isBlock($profileUsernameObj->getUsername())){
+    echo "Video not found";
+    exit();
+}
+
 ?>
 <script src="assets/js/commentActions.js"></script>
 <script src="assets/js/videoPlayerActions.js"></script>

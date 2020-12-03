@@ -1,5 +1,5 @@
 function favourite(button, videoId) {
-    $.post("ajax/likeVideo.php", {videoId: videoId})
+    $.post("ajax/favourite.php", {videoId: videoId})
         .done(function(data) {
 
             var likeButton = $(button);

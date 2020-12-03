@@ -41,6 +41,17 @@ class ButtonProvider {
                 </a>";
     }
 
+
+    public static function createUserProfileButtonSearch($con, $username) {
+        $userObj = new User($con, $username);
+        $profilePic = $userObj->getProfilePic();
+        $link = "profile.php?username=$username";
+
+        return "<a href='$link'>
+                    <img src='$profilePic' class='profilePicture'>
+                    $username
+                </a>";
+    }
     public static function createEditVideoButton($videoId) {
         $href = "editVideo.php?videoId=$videoId";
 
@@ -65,6 +76,76 @@ class ButtonProvider {
         $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
 
         return "<div class='subscribeButtonContainer'>
+                    $button
+                </div>";
+    }
+
+    //block button
+    public static function createBlockButton($con, $userToObj, $userLoggedInObj) {
+
+        $userTo = $userToObj->getUsername();
+        $userLoggedIn = $userLoggedInObj->getUsername();
+
+
+        $isBlock = $userLoggedInObj->isBlock($userTo);
+
+        $buttonText = $isBlock ? "BLOCKED" : "BLOCK";
+
+
+        $buttonClass = $isBlock ? "Unblock button" : "block button";
+        $action = "block(\"$userTo\", \"$userLoggedIn\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
+
+
+    //family button
+    public static function createFamilyButton($con, $userToObj, $userLoggedInObj) {
+
+        $userTo = $userToObj->getUsername();
+        $userLoggedIn = $userLoggedInObj->getUsername();
+
+
+        $isFamily = $userLoggedInObj->isFamily($userTo);
+
+        $buttonText = $isFamily ? "UNFAMILY" : "FAMILY";
+
+
+        $buttonClass = $isFamily? "unfamily button" : "family button";
+        $action = "family(\"$userTo\", \"$userLoggedIn\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
+
+    //friends button
+    public static function createFriendsButton($con, $userToObj, $userLoggedInObj) {
+
+        $userTo = $userToObj->getUsername();
+        $userLoggedIn = $userLoggedInObj->getUsername();
+
+
+        $isFriend = $userLoggedInObj->isFriend($userTo);
+
+        $buttonText = $isFriend? "UNFRIEND" : "FRIEND" ;
+
+
+        $buttonClass = $isFriend? " unfriend" : "friend button";
+        $action = "friend(\"$userTo\", \"$userLoggedIn\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
                     $button
                 </div>";
     }

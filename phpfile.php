@@ -10,11 +10,11 @@ else {
     echo "Channel not found";
     exit();
 }
+?>
 
-
-echo $profileUsername;
+<?php
 $messageSection = new MessageSection($con, $profileUsername, $userLoggedInObj);
 echo $messageSection->create();
-
 ?>
+
 <?php require_once("includes/footer.php"); ?>
