@@ -6,10 +6,12 @@ class VideoProcessor {
     private $allowedTypes = array("mp4", "flv", "webm", "mkv", "vob", "ogv", "ogg", "avi", "wmv", "mov", "mpeg", "mpg");
 
     //private $ffmpegPath = "ffmpeg/mac/regular-xampp/ffmpeg"; // *** MAC (USING REGULAR XAMPP) ***
-    //rivate $ffmpegPath = "ffmpeg/mac/xampp-VM/ffmpeg"; // *** MAC (USING XAMPP VM) ***
-    private $ffmpegPath = "ffmpeg/ffmpeg"; // *** LINUX ***
+    //private $ffmpegPath = "ffmpeg/mac/xampp-VM/ffmpeg"; // *** MAC (USING XAMPP VM) ***
+    //private $ffmpegPath = "ffmpeg/linux/ffmpeg"; // *** LINUX ***
     // private $ffmpegPath = "ffmpeg/windows/ffmpeg.exe"; //  *** WINDOWS ***
 
+
+    private $ffmpegPath = "ffmpeg/ffmpeg"; //  mac
     private $ffprobePath ="ffmpeg/ffprobe";
     public function __construct($con) {
         $this->con = $con;

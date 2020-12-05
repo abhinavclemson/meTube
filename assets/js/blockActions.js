@@ -21,6 +21,7 @@ function block(userTo, userFrom, button) {
 }
 
 
+
 function friend(userTo, userFrom, button) {
 
     if(userTo == userFrom) {
@@ -65,3 +66,5 @@ function family(userTo, userFrom, button) {
 
         });
 }
+
+

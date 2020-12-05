@@ -149,6 +149,24 @@ class ButtonProvider {
                     $button
                 </div>";
     }
+    //Delete button
+    public static function createDeleteButton($con, $videoId) {
+
+        $isVideo= ButtonProvider::isVideo($con,$videoId);
+
+        $buttonText = $isVideo ? "DELETE" : "DELETED";
+
+
+        $buttonClass = $isVideo ? "delete button" : "deleted button";
+        $action = "deleted( \"$videoId\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
 
 
     public static function createUserProfileNavigationButton($con, $username) {
@@ -160,6 +178,15 @@ class ButtonProvider {
                         <span class='signInLink'>SIGN IN</span>
                     </a>";
         }
+    }
+
+    public function isVideo($con,$videoId){
+        $query = $con->prepare("SELECT * FROM videos WHERE id=:videoId");
+        $query->bindParam(":videoId", $videoId);
+        $query->execute();
+
+        return $query->fetchColumn();
+
     }
 
 

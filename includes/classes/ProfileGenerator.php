@@ -1,6 +1,8 @@
 <?php
 require_once("ProfileData.php");
 require_once("MessageSection.php");
+require_once("SearchResultsProvider.php");
+
 class ProfileGenerator {
 
     private $con, $userLoggedInObj, $profileData;
@@ -122,26 +124,92 @@ class ProfileGenerator {
 
         if($this->userLoggedInObj->getUsername() == $this->profileData->getProfileUsername()) {
             $msgSection = '';
+            $privateAccess = true;
         }
         else{
             $messageSection = new MessageSection($this->con, $this->profileData->getProfileUsername(), $this->userLoggedInObj);
             $msgSection = $messageSection->create();
+            $privateAccess = false;
+
         }
 
-        $videos = $this->profileData->getUsersVideos();
+
+        //relation between user and profile owner
+        $profileUsername = $this->profileData->getProfileUsername();
+
+        $friendArray = array();
+        $familyArray = array();
+        $privateArray = array();
+
+        $isFriend = $this->userLoggedInObj->isFriend($profileUsername);
+        $isFamily = $this->userLoggedInObj->isFamily($profileUsername);
+
+        $publicVideos = $this->profileData->getUsersVideos(1);
+
+
+        $videos = array();
+        if($isFriend or $privateAccess){
+            $friendArray = $this->profileData->getUsersVideos(2);
+
+        }
+        if($isFamily or $privateAccess){
+            $familyArray = $this->profileData->getUsersVideos(3);
+
+        }
+        if($privateAccess){
+            $privateArray = $this->profileData->getUsersVideos(0);
+
+        }
+
+
+        $videos = $publicVideos;
+
 
         if(sizeof($videos) > 0) {
             $videoGrid = new VideoGrid($this->con, $this->userLoggedInObj);
             $videoGridHtml = $videoGrid->create($videos, null, false);
         }
+
         else {
-            $videoGridHtml = "<span>This user has no videos</span>";
+            $videoGridHtml = "<span>No Videos for public to Show.</span>";
+        }
+
+
+        //private
+        if(sizeof($privateArray) > 0) {
+            $privateVideoGrid = new VideoGrid($this->con, $this->userLoggedInObj);
+            $privateVideoGridHtml = $privateVideoGrid->create($privateArray, null, false);
+        }
+
+        else {
+            $privateVideoGridHtml = "<span>No Private Videos to Show.</span>";
+        }
+
+        //family
+        if(sizeof($familyArray) > 0) {
+            $familyVideoGrid = new VideoGrid($this->con, $this->userLoggedInObj);
+            $familyVideoGridHtml = $familyVideoGrid->create($familyArray, null, false);
+        }
+
+        else {
+            $familyVideoGridHtml  = "<span>No Videos for family to Show.</span>";
+        }
+
+        //friends
+        if(sizeof($friendArray) > 0) {
+            $friendVideoGrid = new VideoGrid($this->con, $this->userLoggedInObj);
+            $friendVideoGridHtml = $friendVideoGrid->create($friendArray, null, false);
+        }
+
+        else {
+            $friendVideoGridHtml  = "<span>No Videos for friends to Show.</span>";
         }
 
         $aboutSection = $this->createAboutSection();
 
 
 
+        // for relationships
 
         $families = $this->userLoggedInObj->getFamily();
         $familyItems = "";
@@ -173,7 +241,19 @@ class ProfileGenerator {
                     </div>
                     
                     <div class='tab-pane fade show active' id='videos' role='tabpanel' aria-labelledby='videos-tab'>
-                        $videoGridHtml
+                                                
+                        <h5>Private</h5>
+                       <div>$privateVideoGridHtml</div>
+                      
+                        <h5>Public</h5>
+                        <div>$videoGridHtml</div>
+                        
+                        <h5>Shared with Family</h5>                                           
+                        <div>$familyVideoGridHtml</div>
+                        
+                        <h5>Shared with Friends</h5>                      
+                        <div>$friendVideoGridHtml</div>
+                        
                     </div>
 
                     

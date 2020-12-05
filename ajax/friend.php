@@ -18,10 +18,22 @@ if(isset($_POST['userTo']) && isset($_POST['userFrom'])) {
         $query->bindParam(":username", $username);
         $query->bindParam(":fname", $fname);
         $query->execute();
+
+        $query = $con->prepare("INSERT INTO friend(username, fname) VALUES(:fname, :username)");
+
+        $query->bindParam(":username", $username);
+        $query->bindParam(":fname", $fname);
+        $query->execute();
     }
     else {
         // Delete
         $query = $con->prepare("DELETE FROM friend WHERE username=:username AND fname=:fname");
+        $query->bindParam(":username", $username);
+        $query->bindParam(":fname", $fname);
+        $query->execute();
+
+        $query = $con->prepare("DELETE FROM friend WHERE username=:fname AND fname=:username");
+
         $query->bindParam(":username", $username);
         $query->bindParam(":fname", $fname);
         $query->execute();

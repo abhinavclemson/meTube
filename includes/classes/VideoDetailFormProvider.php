@@ -30,14 +30,19 @@ class VideoDetailFormProvider {
         $privacyInput = $this->createPrivacyInput($video->getPrivacy());
         $categoriesInput = $this->createCategoriesInput($video->getCategory());
         $saveButton = $this->createSaveButton();
+        $deleteButton = ButtonProvider::createDeleteButton($this->con, $_GET['videoId']);
         return "<form method='POST'>
                     $titleInput
                     $descriptionInput
                     $privacyInput
                     $categoriesInput
                     $saveButton
+                    $deleteButton
+
                 </form>";
     }
+
+
 
     private function createFileInput() {
 
@@ -66,10 +71,16 @@ class VideoDetailFormProvider {
 
         $privateSelected = ($value == 0) ? "selected='selected'" : "";
         $publicSelected = ($value == 1) ? "selected='selected'" : "";
+        $friendSelected = ($value == 2) ? "selected='selected'" : "";
+        $familySelected = ($value == 3) ? "selected='selected'" : "";
+
         return "<div class='form-group'>
                     <select class='form-control' name='privacyInput'>
                         <option value='0' $privateSelected>Private</option>
                         <option value='1' $publicSelected>Public</option>
+                        <option value='2' $friendSelected>friends</option>
+                        <option value='3' $familySelected>family</option>
+
                     </select>
                 </div>";
     }
@@ -102,6 +113,9 @@ class VideoDetailFormProvider {
     }
 
     private function createSaveButton() {
+        return "<button type='submit' class='btn btn-primary' name='saveButton'>Save</button>";
+    }
+    private function createDeleteButton() {
         return "<button type='submit' class='btn btn-primary' name='saveButton'>Save</button>";
     }
 

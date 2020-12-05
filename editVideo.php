@@ -65,9 +65,12 @@ if(isset($_POST["saveButton"])) {
         <?php
         $formProvider = new VideoDetailFormProvider($con);
         echo $formProvider->createEditDetailsForm($video);
+
+
         ?>
 
     </div>
+
     <div>
 
     </div>

@@ -10,3 +10,21 @@ function setNewThumbnail(thumbnailId, videoId, itemElement) {
             alert("Thumbnail updated");
         });
 }
+
+
+function deleted (videoId, button){
+
+
+    $.post("ajax/delete.php", { videoId: videoId })
+        .done(function(data) {
+            if(data != null) {
+                $(button).toggleClass("delete deleted");
+                var buttonText = $(button).hasClass("delete") ? "DELETE" : "DELETED";
+            }
+            else {
+                alert("Something went wrong");
+            }
+
+        });
+}
+

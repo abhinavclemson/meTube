@@ -74,7 +74,7 @@ class User {
     }
 
     public function isFamily($userTo) {
-        $query = $this->con->prepare("SELECT * FROM family WHERE username=:username AND fname=:fname");
+        $query = $this->con->prepare("SELECT * FROM family WHERE (username=:username AND fname=:fname) or (username=:fname AND fname=:username)");
         $query->bindParam(":fname", $userTo);
         $query->bindParam(":username", $username);
         $username = $this->getUsername();
@@ -83,7 +83,7 @@ class User {
     }
 
     public function isFriend($userTo) {
-        $query = $this->con->prepare("SELECT * FROM friend WHERE username=:username AND fname=:fname");
+        $query = $this->con->prepare("SELECT * FROM friend WHERE (username=:username AND fname=:fname) or (username=:fname AND fname=:username)");
         $query->bindParam(":username", $username);
         $query->bindParam(":fname", $userTo);
         $username = $this->getUsername();
@@ -212,6 +212,52 @@ class User {
 
 
         return $friends;
+
+    }
+
+
+
+    //relation type
+    public function getRelation($userTo) {
+        $username = $this->getUsername();
+
+
+
+        //if user is visiting the same profile
+        if($username==$userTo){
+            return 0;
+        }
+
+
+        $query = $this->con->prepare("SELECT * FROM friend WHERE (username=:messageBy and fname=:messageTo) or ( username=:messageTo and fname=:messageBy)");
+        $query->bindParam(":messageBy", $username);
+        $query->bindParam(":messageTo", $userTo);
+        $query->execute();
+
+        if($query->rowCount()>0){
+            return 2;
+        }
+
+
+        $query = $this->con->prepare("SELECT * FROM family WHERE (username=:messageBy and fname=:messageTo) or ( username=:messageTo and fname=:messageBy)");
+        $query->bindParam(":messageBy", $username);
+        $query->bindParam(":messageTo", $userTo);
+        $query->execute();
+
+        if($query->rowCount()>0){
+            return 3;
+        }
+
+        return 1;
+
+
+
+
+
+        $privacy_count = $query->rowCount()>0? 3 : 1;
+
+        return $privacy_count;
+
 
     }
 

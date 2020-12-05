@@ -41,8 +41,10 @@ class ProfileData {
         return $this->profileUserObj->getSubscriberCount();
     }
 
-    public function getUsersVideos() {
-        $query = $this->con->prepare("SELECT * FROM videos WHERE uploadedBy=:uploadedBy ORDER BY uploadDate DESC");
+
+
+    public function getUsersVideos($privacy) {
+        $query = $this->con->prepare("SELECT * FROM videos WHERE uploadedBy=:uploadedBy AND privacy=$privacy ORDER BY uploadDate DESC");
         $query->bindParam(":uploadedBy", $username);
         $username = $this->getProfileUsername();
         $query->execute();
@@ -51,6 +53,7 @@ class ProfileData {
         while($row = $query->fetch(PDO::FETCH_ASSOC)) {
             $videos[] = new Video($this->con, $row, $this->profileUserObj->getUsername());
         }
+
         return $videos;
     }
 

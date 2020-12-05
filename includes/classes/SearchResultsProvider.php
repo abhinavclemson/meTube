@@ -21,11 +21,11 @@ class SearchResultsProvider
 
         if ($category) {
             $query = $this->con->prepare("SELECT * FROM videos WHERE (title LIKE CONCAT('%', :term, '%')
-                                        OR uploadedBy LIKE CONCAT('%', :term, '%') ) AND category=$category ORDER BY $orderBy $alpha_order");
+                                        OR uploadedBy LIKE CONCAT('%', :term, '%') ) AND privacy=1 AND category=$category ORDER BY $orderBy $alpha_order");
 
         } else {
             $query = $this->con->prepare("SELECT * FROM videos WHERE title LIKE CONCAT('%', :term, '%')
-                                        OR uploadedBy LIKE CONCAT('%', :term, '%') ORDER BY $orderBy $alpha_order");
+                                        OR uploadedBy LIKE CONCAT('%', :term, '%')  AND privacy=1 ORDER BY $orderBy $alpha_order");
         }
 
         $query->bindParam(":term", $term);
@@ -41,6 +41,7 @@ class SearchResultsProvider
         return $videos;
 
     }
+
 
     public function getUsers($term, $orderBy, $type)
     {
