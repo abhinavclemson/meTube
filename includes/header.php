@@ -68,6 +68,9 @@ $userLoggedInObj = new User($con, $usernameLoggedIn);
 
 
         <div class="rightIcons">
+            <a href="playlists.php">
+                <img src="https://img.icons8.com/material-two-tone/24/000000/video-playlist.png"/>
+            </a>
             <a href="favouritePage.php">
                 <img src="assets/images/icons/star.png"/>
             </a>

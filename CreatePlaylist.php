@@ -2,13 +2,22 @@
 require_once("includes/header.php");
 require_once("includes/classes/VideoDetailFormProvider.php");
 
+if(!User::isLoggedIn()) {
+    header("Location: signin.php");
+}
 
 ?>
+
 <div class="column">
 
     <?php
+    $username =$usernameLoggedIn;
+
+    echo $username;
     $formProvider = new VideoDetailFormProvider($con);
-    echo $formProvider->createUploadForm();
+    echo $formProvider->createPlaylistForm($username);
+
+
     ?>
 
 

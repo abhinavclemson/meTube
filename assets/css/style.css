@@ -828,3 +828,11 @@ a:hover {
     width: 100%;
     cursor: pointer;
 }
+
+
+.form-control {
+
+    padding-right: 0px;
+    position: relative;
+    min-width: 60px !important;
+}

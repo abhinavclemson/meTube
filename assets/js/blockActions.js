@@ -68,3 +68,25 @@ function family(userTo, userFrom, button) {
 }
 
 
+function playlist(userTo, userFrom, button) {
+
+    if(userTo == userFrom) {
+        alert("You can't add to family");
+        return;
+    }
+
+    $.post("ajax/family.php", { userTo: userTo, userFrom: userFrom })
+        .done(function(count) {
+            if(count != null) {
+                $(button).toggleClass("family unfamily");
+
+                var buttonText = $(button).hasClass("family") ? "FAMILY" : "UNFAMILY";
+                $(button).text(buttonText + " " + count);
+            }
+            else {
+                alert("Something went wrong");
+            }
+
+        });
+}
+

@@ -14,6 +14,8 @@ class VideoDetailFormProvider {
         $privacyInput = $this->createPrivacyInput(null);
         $categoriesInput = $this->createCategoriesInput(null);
         $uploadButton = $this->createUploadButton();
+
+        //chooseExistingPlaylistInput
         return "<form action='processing.php' method='POST' enctype='multipart/form-data'>
                     $fileInput
                     $titleInput
@@ -21,6 +23,7 @@ class VideoDetailFormProvider {
                     $privacyInput
                     $categoriesInput
                     $uploadButton
+                    
                 </form>";
     }
 
@@ -42,7 +45,44 @@ class VideoDetailFormProvider {
                 </form>";
     }
 
+    //Create Playlist Input form
+    public function createPlaylistForm($username) {
+        $PlaylistNameInput = $this->createPlaylistNameInput(null);
+        $privacyInput = $this->createPrivacyInput(null);
 
+        //chooseExistingPlaylistInput
+
+        $usernameObj = new User($this->con, $username);
+        $saveButton = $this->createSaveButton();
+        //$uploadButton = $this->createUploadPlaylistForm($usernameObj->getUsername());
+
+        return "<form action='playlistProcessing.php' method='POST' enctype='multipart/form-data'>
+                    <h4>Create Playlist</h4>
+                    $PlaylistNameInput 
+                    $privacyInput
+                    $saveButton
+                </form>";
+    }
+
+    //Create Adding to existing playlist
+    public function createAddToPlaylistForm($username,$videoId) {
+        $privacyInput = $this->createPrivacyInput(null);
+
+
+        $usernameObj = new User($this->con, $username);
+        $playlistInput = $usernameObj->getCurrentUserPlaylist();
+        $saveButton = $this->createSaveButton();
+        //$uploadButton = $this->createUploadPlaylistForm($usernameObj->getUsername());
+        $videoIdInput ="<p>Video id <br/><input name='videoId' value='$videoId' /></p>";
+
+        return "<form action='playlistProcessingAdd.php' method='POST' enctype='multipart/form-data'>
+                    <h4>Add to a Playlist</h4>
+                    $privacyInput
+                    $playlistInput
+                    $videoIdInput
+                    $saveButton
+                </form>";
+    }
 
     private function createFileInput() {
 
@@ -56,6 +96,14 @@ class VideoDetailFormProvider {
         if($value == null) $value = "";
         return "<div class='form-group'>
                     <input class='form-control' type='text' placeholder='Title' name='titleInput' value='$value'>
+                </div>";
+    }
+
+    //playlist
+    private function createPlaylistNameInput($value) {
+        if($value == null) $value = "";
+        return "<div class='form-group'>
+                    <input class='form-control' type='text' placeholder='Playlist Name' name='playlistNameInput' value='$value'>
                 </div>";
     }
 
@@ -107,6 +155,32 @@ class VideoDetailFormProvider {
         return $html;
 
     }
+
+    //For playlist form
+    private function chooseExistingPlaylistInput($value, $username) {
+        if($value == null) $value = "";
+        $query = $this->con->prepare("SELECT * FROM playlist WHERE username=:username ");
+        $query->bindParam(":username",$username);
+        $query->execute();
+
+        $html = "<div class='form-group'>
+                    <select class='form-control' name='playlistInput'>";
+
+        while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row["id"];
+            $name = $row["Playlist_name"];
+            $selected = ($id == $value) ? "selected='selected'" : "";
+
+            $html .= "<option $selected value='$id'>$name</option>";
+        }
+
+        $html .= "</select>
+                </div>";
+
+        return $html;
+
+    }
+
 
     private function createUploadButton() {
         return "<button type='submit' class='btn btn-primary' name='uploadButton'>Upload</button>";

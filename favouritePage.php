@@ -3,8 +3,6 @@ require_once("includes/header.php");
 require_once("includes/classes/VideoDetailFormProvider.php");
 require_once("includes/classes/VideoGridFavourite.php");
 
-
-
 ?>
 
     <div class="videoSection">

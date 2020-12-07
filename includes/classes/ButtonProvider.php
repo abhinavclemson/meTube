@@ -169,6 +169,72 @@ class ButtonProvider {
     }
 
 
+
+
+    //create playlist button
+    public static function createPlaylistDeleteButton($userLoggedInObj, $videoId, $playlistName) {
+
+
+        $username = $userLoggedInObj->getUsername();
+
+        $buttonText = $text;
+
+
+        $buttonClass = $isVideo ? "add button" : "remove button";
+        $action = "playlistAdd( \"$videoId\", \"$\" this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
+
+    //video in a playlist
+    public static function deletePlaylistVideoButton($userLoggedInObj, $videoId, $playlistName,$buttonText) {
+
+
+        $username = $userLoggedInObj->getUsername();
+
+
+        $buttonClass = "delete button";
+
+
+        $buttonClass = $isVideo ? "add button" : "remove button";
+        $action = "playlistVideoDelete( \"$videoId\", \"$username\", \"$playlistName\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
+
+    public static function deletePlaylistButton($userLoggedInObj, $playlistName,$buttonText) {
+
+
+        $username = $userLoggedInObj->getUsername();
+
+
+        $buttonClass = "delete button";
+
+
+        $buttonClass = $isVideo ? "add button" : "remove button";
+        $action = "playlistDelete(\"$username\", \"$playlistName\", this)";
+
+
+        $button = ButtonProvider::createButton($buttonText, null, $action, $buttonClass);
+
+        return "<div class='blockButtonContainer' >
+                    $button
+                </div>";
+    }
+
+
+
+
     public static function createUserProfileNavigationButton($con, $username) {
         if(User::isLoggedIn()) {
             return ButtonProvider::createUserProfileButton($con, $username);
@@ -188,6 +254,8 @@ class ButtonProvider {
         return $query->fetchColumn();
 
     }
+
+
 
 
 

@@ -23,9 +23,9 @@ if(isset($_GET["category"])){
 }
 
 
+
 $searchResultsProvider = new SearchResultsProvider($con, $userLoggedInObj);
 $videos = $searchResultsProvider->getVideos($term, $orderBy,$category);
-
 
 
 
@@ -50,9 +50,10 @@ $videoGrid = new VideoGrid($con, $userLoggedInObj);
     ?>
 
     <div class="users">
-
+        <h6>Users Found</h6>
         <?php
         $users = $searchResultsProvider->getUsers($term, $orderBy,$category);
+        $count=0;
 
         foreach($users as $user) {
             echo $user;

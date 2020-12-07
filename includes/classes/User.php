@@ -217,49 +217,86 @@ class User {
 
 
 
-    //relation type
-    public function getRelation($userTo) {
+    //Playlists
+    public function getCurrentUserPlaylist() {
         $username = $this->getUsername();
 
-
-
-        //if user is visiting the same profile
-        if($username==$userTo){
-            return 0;
-        }
-
-
-        $query = $this->con->prepare("SELECT * FROM friend WHERE (username=:messageBy and fname=:messageTo) or ( username=:messageTo and fname=:messageBy)");
-        $query->bindParam(":messageBy", $username);
-        $query->bindParam(":messageTo", $userTo);
+        $query = $this->con->prepare("SELECT DISTINCT username, Playlist_name FROM playlists WHERE username=:username");
+        $query->bindParam(":username", $username);
         $query->execute();
 
-        if($query->rowCount()>0){
-            return 2;
+        $value="";
+        $html = "<div class='form-group' method='Post'>
+                    <select class='form-control' name='playlistInput' required>";
+        $html .= "<option value=''>Add to listed playlist</option>";
+        while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row["username"];
+            $playlistName = $row["Playlist_name"];
+            $selected = ($playlistName == $value) ? "selected='selected'" : "";
+
+            $html .= "<option  value='$playlistName' $selected> $playlistName </option>";
         }
 
+        $html .= "</select>
+                </div>";
 
-        $query = $this->con->prepare("SELECT * FROM family WHERE (username=:messageBy and fname=:messageTo) or ( username=:messageTo and fname=:messageBy)");
-        $query->bindParam(":messageBy", $username);
-        $query->bindParam(":messageTo", $userTo);
-        $query->execute();
-
-        if($query->rowCount()>0){
-            return 3;
-        }
-
-        return 1;
-
-
-
-
-
-        $privacy_count = $query->rowCount()>0? 3 : 1;
-
-        return $privacy_count;
+        return $html;
 
 
     }
+    public function getCurrentUserPlaylistGrid() {
+        $username = $this->getUsername();
+
+        $query = $this->con->prepare("SELECT DISTINCT Playlist_name,username FROM playlists WHERE username=:username");
+        $query->bindParam(":username", $username);
+        $query->execute();
+
+        $value="";
+
+
+
+
+        $html = '';
+        while($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $id = $row["username"];
+            $playlistName = $row["Playlist_name"];
+            $urlCreate ="playlistWatch.php?username=$id&&playlistName=$playlistName";
+            $Playlists= ButtonProvider::createHyperlinkButton($playlistName,"", $urlCreate,'');
+
+            $html .= "$Playlists";
+        }
+
+
+        return $html;
+
+
+
+    }
+
+
+    public function isPlaylist($playlistName){
+        $username = $this->getUsername();
+        echo $username;
+        $query= $this->con->prepare("SELECT * FROM playlists WHERE playlist_name=:playlistName and username=:username");
+        $query->bindParam(":username", $username);
+        $query->bindParam(":playlistName", $playlistName);
+        $query->execute();
+
+
+        return $query->rowCount() > 0;
+
+
+    }
+    public function makePlaylist($playlistName, $privacy, $username){
+        $query= $this->con->prepare("INSERT INTO playlists(playlist_name, username, privacy) VALUES(:playlistName, :username, :privacy)");
+        $query->bindParam(":username", $username);
+        $query->bindParam(":playlistName", $playlistName);
+        $query->bindParam(":privacy", $privacy);
+        $query->execute();
+        return 0;
+
+    }
+
 
 
 }

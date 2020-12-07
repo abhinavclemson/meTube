@@ -1,5 +1,6 @@
 <?php
 require_once("includes/classes/ButtonProvider.php");
+
 class VideoInfoControls {
 
     private $video, $userLoggedInObj;
@@ -15,11 +16,26 @@ class VideoInfoControls {
         $dislikeButton = $this->createDislikeButton();
         $favButton = $this->createfavouriteButton();
 
+        $videoId = $this->video->getId();
+        //playlistInput To Userd
+        $urlAdd ="addToPlaylist.php?id=$videoId";
+        $urlCreate ="CreatePlaylist.php?id=$videoId";
+
+
+
+
+        $AddPlaylistInput = ButtonProvider::createHyperlinkButton("ADD To Playlist","", $urlAdd,'');
+        $CreatePlaylistnput = ButtonProvider::createHyperlinkButton("Create a Playlist","", $urlCreate,'');
+
         return "<div class='controls'>
-                
                     $likeButton
                     $dislikeButton
                     $favButton
+                    
+                    
+                    $AddPlaylistInput
+                    $CreatePlaylistnput
+                    
                 </div>";
     }
 
